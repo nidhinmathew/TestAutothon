@@ -34,7 +34,7 @@ namespace TestAutomation.Helper
             {
                 case ReportElementType.Text: return $"<span>{data}</span>";
                 case ReportElementType.Link: return $"<a href=\"{url}\">{data}</a>";
-                case ReportElementType.Image: return $"<img class=\"myImg\" src=\"{url}\" alt=\"{data}\" width=\"{width}\" height=\"{height}\"/>";
+                case ReportElementType.Image: return $"<img class=\"myImg\" src=\"{(url != null ? url.Replace("\\", "/") : "")}\" alt=\"{data}\" width=\"{width}\" height=\"{height}\"/>";
                 case ReportElementType.Table: {
                         string html = string.Empty;
 

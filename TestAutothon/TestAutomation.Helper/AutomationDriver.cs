@@ -46,7 +46,7 @@ namespace TestAutomation.Helper
             }
         }
 
-        public void StartBrowser(AutomationBrowserType browserType = AutomationBrowserType.PCChromeBrowser, int defaultTimeOut = 30, string driverPath = "")
+        public void StartBrowser(AutomationBrowserType browserType = AutomationBrowserType.PCChromeBrowser, int defaultTimeOut = 1, string driverPath = "")
         {
             switch (browserType)
             {
@@ -63,7 +63,7 @@ namespace TestAutomation.Helper
                     break;
             }
 
-            BrowserWait = new WebDriverWait(this.Browser, TimeSpan.FromSeconds(defaultTimeOut));
+            BrowserWait = new WebDriverWait(this.Browser, TimeSpan.FromMinutes(defaultTimeOut));
         }
 
         public void StopBrowser()

@@ -18,11 +18,13 @@ namespace TestAutomation.Helper.Models
         {
             get
             {
-                var wikiList = !string.IsNullOrEmpty(Directors_Wiki) ? Directors_Wiki.Split(',') : null;
-                var imdbList = !string.IsNullOrEmpty(Directors_Imdb) ?  Directors_Imdb.Split(',') : null;
-
-                if (wikiList != null && imdbList != null && wikiList.Count() == imdbList.Count() &&  wikiList.Intersect(imdbList).Count() == imdbList.Count())
+                var wikiList = !string.IsNullOrEmpty(Directors_Wiki) ? Directors_Wiki.Split(',').ToList() : null;
+                var imdbList = !string.IsNullOrEmpty(Directors_Imdb) ?  Directors_Imdb.Split(',').ToList() : null;
+              
+                if (wikiList != null && imdbList != null && wikiList.Count() == imdbList.Count() && wikiList.Intersect(imdbList, StringComparer.InvariantCultureIgnoreCase).Count() == wikiList.Count())
+                {
                     return true;
+                }                    
 
                 return false;
             }

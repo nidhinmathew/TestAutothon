@@ -27,12 +27,12 @@ namespace TestAutomation.Helper
         public void Automate(List<string> testInputs)
         {
             Console.WriteLine($"UTC-{DateTime.UtcNow}: Automation started.");
-            ParallelOptions option = new ParallelOptions() { MaxDegreeOfParallelism = 1 };
+            ParallelOptions option = new ParallelOptions() { MaxDegreeOfParallelism = 5 };
 
             Parallel.ForEach(testInputs, option, (input) =>
             {
                 var automationDriver = new AutomationDriver();
-                automationDriver.StartBrowser(browserType, 60, driverPath);
+                automationDriver.StartBrowser(browserType, 3, driverPath);
                 AutomationFacade facade = new AutomationFacade(automationDriver.Browser, input);
                 MovieInfo info = null;
                 try
@@ -40,8 +40,9 @@ namespace TestAutomation.Helper
                     info = facade.Run(this.outputDirectory);
                     Console.WriteLine($"The test {info.Passed} for {info.Name}");
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Console.WriteLine(ex.Message);
                     info = new MovieInfo();
                     info.Name = input;
                     info.ImdbLink = "Cannot find IMDb result";

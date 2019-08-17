@@ -1,5 +1,6 @@
 ﻿using OpenQA.Selenium;
 using System.IO;
+using System.Linq;
 using TestAutomation.Helper.Models;
 using TestAutomation.Helper.Pages;
 
@@ -72,15 +73,17 @@ namespace TestAutomation.Helper
                 .NavigateToWiki();
 
             info.Directors_Wiki = this.WPage.GetDirector();
-            info.WikiScreenShotPath = Path.Combine(outputDirectory, $"{this.keyWord}_wiki.png");
-            this.WPage.GetScreenshot(info.WikiScreenShotPath);
+            info.WikiScreenShotPath = $"{ExcludeSymbols(this.keyWord)}_wiki.png";
+            this.WPage.GetScreenshot(Path.Combine(outputDirectory, info.WikiScreenShotPath));
 
             this.WPage.NavigateToIMDb();
 
             info.Directors_Imdb = this.IPage.GetDirector();
-            info.ImdbScreenShotPath = Path.Combine(outputDirectory, $"{this.keyWord}_imdb.png");
-            this.IPage.GetScreenshot(info.ImdbScreenShotPath);
+            info.ImdbScreenShotPath = $"{ExcludeSymbols(this.keyWord)}_imdb.png";
+            this.IPage.GetScreenshot(Path.Combine(outputDirectory, info.ImdbScreenShotPath));
             return info;
         }
+
+        private string ExcludeSymbols(string src) => new string(src.Where(char.IsLetterOrDigit).ToArray());
     }
 }
