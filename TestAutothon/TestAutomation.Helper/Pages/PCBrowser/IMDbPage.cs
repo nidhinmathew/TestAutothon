@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TestAutomation.Helper.Models;
 
 namespace TestAutomation.Helper.Pages
 {
@@ -16,14 +17,14 @@ namespace TestAutomation.Helper.Pages
             this.timeOutInSeconds = timeOutInSeconds;
         }
 
-        public IWebElement SingleDirector {
+        public IWebElement PCSingleDirector {
             get
             {
                 return this.driver.FindElement(By.XPath($"//div[contains(@class,'plot_summary')]/div[contains(@class,'credit_summary_item')]/h4[contains(text(), 'Director:')]/following-sibling::a"), this.timeOutInSeconds);
             }
         }
 
-        public IEnumerable<IWebElement> MultipleDirectors {
+        public IEnumerable<IWebElement> PCMultipleDirectors {
             get
             {
                 try
@@ -37,23 +38,46 @@ namespace TestAutomation.Helper.Pages
             }
         }
 
+        public IWebElement MobDirector
+        {
+            get
+            {
+                return this.driver.FindElement(By.XPath($"//a[contains(@itemprop,'director')]/div/h3[contains(text(), 'Director')]/following-sibling::span"), this.timeOutInSeconds);
+            }
+        }
+        
         public void Navigate(string url)
         {
             this.driver.Navigate().GoToUrl(url);
             this.driver.WaitForPageLoad();
         }
 
-        public string GetDirector()
+        public string GetDirector(AutomationBrowserType browserType)
         {
             string director = string.Empty;
-            if (this.MultipleDirectors != null && this.MultipleDirectors.Any())
+            switch (browserType)
             {
-                director = string.Join(",", this.MultipleDirectors.ToList().Select(d => d.Text).ToList());
+                case AutomationBrowserType.MobileChromeBrowser:
+                    {
+                        director = this.MobDirector.Text.Replace("  ", "");
+                        break;
+                    }
+                default:
+                    {
+                        if (this.PCMultipleDirectors != null && this.PCMultipleDirectors.Any())
+                        {
+                            director = string.Join(",", this.PCMultipleDirectors.ToList().Select(d => d.Text).ToList());
+                        }
+                        else
+                        {
+                            director = this.PCSingleDirector.Text;
+                        }
+                        break;
+                    }
             }
-            else
-            {
-                director = this.SingleDirector.Text;
-            }
+
+            
+            
             return director;
         }
 

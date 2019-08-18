@@ -84,7 +84,7 @@ namespace TestAutomation.Helper
                 info.ImdbLink = this.WPage.GetIMDbLink(browserType);
                 this.IPage.Navigate(info.ImdbLink);
 
-                info.Directors_Imdb = this.IPage.GetDirector();
+                info.Directors_Imdb = this.IPage.GetDirector(browserType);
 
                 info.ImdbScreenShotPath = $"{AutomationUtility.ExcludeSymbols(info.Name)}_imdb.png";
                 this.IPage.GetScreenshot(Path.Combine(outputDirectory, info.ImdbScreenShotPath));                
