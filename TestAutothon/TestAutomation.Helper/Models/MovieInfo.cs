@@ -1,17 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Serialization;
 
 namespace TestAutomation.Helper.Models
 {
+    [XmlRoot("MovieInfo")]
     public class MovieInfo
     {
+        [XmlAttribute("name")]
         public string Name { get; set; }
+
         public string WikiScreenShotPath { get; set; }
+
+        public List<string> WikiLinks { get; set; }
+
         public string WikiLink { get; set; }
+
         public string Directors_Wiki { get; set; }
+
         public string ImdbScreenShotPath { get; set; }
+
         public string ImdbLink { get; set; }
+
         public string Directors_Imdb { get; set; }
 
         public bool Passed

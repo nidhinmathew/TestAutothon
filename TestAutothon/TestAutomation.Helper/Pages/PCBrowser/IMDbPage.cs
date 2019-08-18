@@ -8,16 +8,18 @@ namespace TestAutomation.Helper.Pages
     public class IMDbPage
     {
         private readonly IWebDriver driver;
+        private readonly int timeOutInSeconds;
 
-        public IMDbPage(IWebDriver _driver)
+        public IMDbPage(IWebDriver _driver, int timeOutInSeconds = 30)
         {
             this.driver = _driver;
+            this.timeOutInSeconds = timeOutInSeconds;
         }
 
         public IWebElement SingleDirector {
             get
             {
-                return this.driver.FindElement(By.XPath($"//div[contains(@class,'plot_summary')]/div[contains(@class,'credit_summary_item')]/h4[contains(text(), 'Director:')]/following-sibling::a"));
+                return this.driver.FindElement(By.XPath($"//div[contains(@class,'plot_summary')]/div[contains(@class,'credit_summary_item')]/h4[contains(text(), 'Director:')]/following-sibling::a"), this.timeOutInSeconds);
             }
         }
 
@@ -33,6 +35,12 @@ namespace TestAutomation.Helper.Pages
                     return null;
                 }
             }
+        }
+
+        public void Navigate(string url)
+        {
+            this.driver.Navigate().GoToUrl(url);
+            this.driver.WaitForPageLoad();
         }
 
         public string GetDirector()

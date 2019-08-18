@@ -9,80 +9,98 @@ namespace TestAutomation.Helper
 {
     public class AutomationHelper
     {
-        private List<MovieInfo> movieInfos;
-        private object synchronizer = new object();
         private readonly AutomationBrowserType browserType;
         private readonly string driverPath;
-        private string outputDirectory;
 
         public AutomationHelper(AutomationBrowserType browserType, string driverPath = "")
         {
-            this.movieInfos = new List<MovieInfo>();
-
             this.browserType = browserType;
             this.driverPath = driverPath;
-            this.outputDirectory = GetOutputDirectory();
         }
 
-        public void Automate(List<string> testInputs)
+        public void GetWikiLinks(List<string> testInputs, string outputDirectory, int noOfResults = 2)
+        {
+            Console.WriteLine($"UTC-{DateTime.UtcNow}: Retrieving Wiki Links.");
+            var googleDriver = new AutomationDriver();
+            googleDriver.StartBrowser(this.browserType, 3, driverPath);
+
+            AutomationFacade facade = new AutomationFacade(googleDriver.Browser);
+            if(testInputs != null && testInputs.Any())
+            {
+                facade.NavigateToGoogle();
+                testInputs.ForEach(input =>
+                {
+                    var info = facade.GetWikiLinks(input, noOfResults);
+                    AutomationUtility.Serialize<MovieInfo>(info, $"{outputDirectory}\\{AutomationUtility.ExcludeSymbols(info.Name)}.xml");
+                });
+            }
+
+            googleDriver.StopBrowser();
+        }
+
+        public void Automate(List<string> testInputs, string outputDirectory, int degreeOfParallelism = 5)
         {
             Console.WriteLine($"UTC-{DateTime.UtcNow}: Automation started.");
-            ParallelOptions option = new ParallelOptions() { MaxDegreeOfParallelism = 5 };
-
+            ParallelOptions option = new ParallelOptions() { MaxDegreeOfParallelism = degreeOfParallelism };        
+            
             Parallel.ForEach(testInputs, option, (input) =>
             {
-                var automationDriver = new AutomationDriver();
-                automationDriver.StartBrowser(browserType, 3, driverPath);
-                AutomationFacade facade = new AutomationFacade(automationDriver.Browser, input);
-                MovieInfo info = null;
-                try
+                var info = AutomationUtility.Deserialize<MovieInfo>($"{outputDirectory}\\{AutomationUtility.ExcludeSymbols(input)}.xml");
+                if(info != null)
                 {
-                    info = facade.Run(this.outputDirectory);
-                    Console.WriteLine($"The test {info.Passed} for {info.Name}");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                    info = new MovieInfo();
-                    info.Name = input;
-                    info.ImdbLink = "Cannot find IMDb result";
-                    info.WikiLink = "Cannot find Wikipedia result";
-                }
+                    var automationDriver = new AutomationDriver();
+                    automationDriver.StartBrowser(this.browserType, 3, driverPath);
+                    AutomationFacade facade = new AutomationFacade(automationDriver.Browser, 120);
 
-                lock (synchronizer)
-                {
-                    this.movieInfos.Add(info);
-                }
+                    try
+                    {
+                        info = facade.Run(info, outputDirectory, this.browserType);
 
-                automationDriver.StopBrowser();
+                        if(string.IsNullOrEmpty(info.Directors_Wiki))
+                            info.Directors_Wiki = "Cannot find Wikipedia result";
+
+                        if (string.IsNullOrEmpty(info.Directors_Imdb))
+                            info.Directors_Imdb = "Cannot find IMDb result";
+
+                        Console.WriteLine($"The test {info.Passed} for {info.Name}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                        info = new MovieInfo();
+                        info.Name = input;
+                        info.Directors_Imdb = "Cannot find IMDb result";
+                        info.Directors_Wiki = "Cannot find Wikipedia result";
+                    }
+                    
+                    AutomationUtility.Serialize<MovieInfo>(info, $"{outputDirectory}\\{AutomationUtility.ExcludeSymbols(info.Name)}.xml");
+                    automationDriver.StopBrowser();
+                }
             });
 
-            var header = new List<string> { "Name", "WikiLink", "Wiki_Directors", "Wiki_Screenshot", "ImdbLink", "Imdb_Directors", "Wiki_Screenshot", "Result" };
-            var reportData = new List<List<string>>();
-            reportData.Add(header);
-            reportData.AddRange(this.movieInfos.Select(info => info.ToArray().ToList()).ToList());
+            var reportData = GetReportData(testInputs, outputDirectory);
 
             var report = ReportGenerator.Generate(reportData, "Report Template\\TestAutothonReport.html");
-            SaveReport(report);
+            AutomationUtility.SaveReport(report, $"{outputDirectory}\\Report.html");
 
             Console.WriteLine($"UTC-{DateTime.UtcNow}: Automation completed.");
         }
 
-        private string GetOutputDirectory()
+        public List<List<string>> GetReportData(List<string> testInputs, string outputDirectory)
         {
-            if (!Directory.Exists("Output"))
-            {
-                Directory.CreateDirectory("Output");
-            }
+            var header = new List<string> { "Name", "WikiLink", "Wiki_Directors", "Wiki_Screenshot", "ImdbLink", "Imdb_Directors", "Wiki_Screenshot", "Result" };
+            var reportData = new List<List<string>>();
+            reportData.Add(header);
 
-            var dir = $"Output\\Report -{ DateTime.UtcNow.ToString("MM-dd-yyyy h-mm-ss-ms")}";
-            Directory.CreateDirectory(dir);
-            return dir;
+            testInputs.ForEach(input => {
+                var info = AutomationUtility.Deserialize<MovieInfo>($"{outputDirectory}\\{AutomationUtility.ExcludeSymbols(input)}.xml");
+                if(info != null)
+                    reportData.Add(info.ToArray().ToList());
+            });
+
+            return reportData;
         }
 
-        private void SaveReport(string report)
-        {
-            File.WriteAllText($"{this.outputDirectory}\\Report.html", report);
-        }
+        
     }
 }

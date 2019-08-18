@@ -1,4 +1,5 @@
 ﻿using OpenQA.Selenium;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using TestAutomation.Helper.Models;
@@ -13,12 +14,12 @@ namespace TestAutomation.Helper
         private GooglePage gPage;
         private WikipediaPage wPage;
         private IMDbPage iPage;
-        private string keyWord;
+        private readonly int timeOutInSeconds;
 
-        public AutomationFacade(IWebDriver _driver, string _keyword)
+        public AutomationFacade(IWebDriver _driver, int timeOutInSeconds = 30)
         {
             this.driver = _driver;
-            this.keyWord = _keyword;
+            this.timeOutInSeconds = timeOutInSeconds;
         }
 
         public GooglePage GPage
@@ -27,7 +28,7 @@ namespace TestAutomation.Helper
             {
                 if (gPage == null)
                 {
-                    gPage = new GooglePage(this.driver, this.keyWord);
+                    gPage = new GooglePage(this.driver);
                 }
 
                 return gPage;
@@ -40,7 +41,7 @@ namespace TestAutomation.Helper
             {
                 if (wPage == null)
                 {
-                    wPage = new WikipediaPage(this.driver);
+                    wPage = new WikipediaPage(this.driver, this.timeOutInSeconds);
                 }
 
                 return wPage;
@@ -53,37 +54,63 @@ namespace TestAutomation.Helper
             {
                 if (iPage == null)
                 {
-                    iPage = new IMDbPage(this.driver);
+                    iPage = new IMDbPage(this.driver, this.timeOutInSeconds);
                 }
 
                 return iPage;
             }
         }
 
-        public MovieInfo Run(string outputDirectory)
+        public MovieInfo Run(MovieInfo info, string outputDirectory, AutomationBrowserType browserType)
         {
-            MovieInfo info = new MovieInfo()
+            if(info != null && info.WikiLinks != null && info.WikiLinks.Any())
             {
-                Name = this.keyWord
-            };
+                foreach(var link in info.WikiLinks)
+                {
+                    this.WPage.Navigate(link);
+                    try
+                    {
+                        info.Directors_Wiki = this.WPage.GetDirector();
+                        info.WikiLink = link;
+                        info.WikiScreenShotPath = $"{AutomationUtility.ExcludeSymbols(info.Name)}_wiki.png";
+                        this.WPage.GetScreenshot(Path.Combine(outputDirectory, info.WikiScreenShotPath));
+                    }
+                    catch { }
+                    
+                    if (!string.IsNullOrEmpty(info.Directors_Wiki))
+                        break;
+                };
 
-            this.GPage
-                .Navigate()
-                .Search()
-                .NavigateToWiki();
+                info.ImdbLink = this.WPage.GetIMDbLink(browserType);
+                this.IPage.Navigate(info.ImdbLink);
 
-            info.Directors_Wiki = this.WPage.GetDirector();
-            info.WikiScreenShotPath = $"{ExcludeSymbols(this.keyWord)}_wiki.png";
-            this.WPage.GetScreenshot(Path.Combine(outputDirectory, info.WikiScreenShotPath));
+                info.Directors_Imdb = this.IPage.GetDirector();
 
-            this.WPage.NavigateToIMDb();
+                info.ImdbScreenShotPath = $"{AutomationUtility.ExcludeSymbols(info.Name)}_imdb.png";
+                this.IPage.GetScreenshot(Path.Combine(outputDirectory, info.ImdbScreenShotPath));                
+            }
 
-            info.Directors_Imdb = this.IPage.GetDirector();
-            info.ImdbScreenShotPath = $"{ExcludeSymbols(this.keyWord)}_imdb.png";
-            this.IPage.GetScreenshot(Path.Combine(outputDirectory, info.ImdbScreenShotPath));
             return info;
         }
 
-        private string ExcludeSymbols(string src) => new string(src.Where(char.IsLetterOrDigit).ToArray());
+        public AutomationFacade NavigateToGoogle()
+        {
+            this.GPage.Navigate();
+            return this;
+        }
+
+        public MovieInfo GetWikiLinks(string keyword, int noOfResults = 1)
+        {
+            var results = 
+            this.GPage
+                .Search(keyword)
+                .GetWikiResults(noOfResults);
+
+            return new MovieInfo()
+            {
+                Name = keyword,
+                WikiLinks = results != null ? new List<string>(results) : null
+            };
+        }        
     }
 }
