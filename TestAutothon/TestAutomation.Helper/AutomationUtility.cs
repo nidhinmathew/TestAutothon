@@ -25,14 +25,14 @@ namespace TestAutomation.Helper
 
         public static string ExcludeSymbols(string src) => new string(src.Where(char.IsLetterOrDigit).ToArray());
 
-        public static string GetOutputDirectory()
+        public static string GetOutputDirectory(string directory = "Output")
         {
-            if (!Directory.Exists("Output"))
+            if (!Directory.Exists(directory))
             {
-                Directory.CreateDirectory("Output");
+                Directory.CreateDirectory(directory);
             }
 
-            var dir = $"Output\\Report -{ DateTime.UtcNow.ToString("MM-dd-yyyy h-mm-ss-ms")}";
+            var dir = $"{directory}\\Report -{ DateTime.UtcNow.ToString("MM-dd-yyyy h-mm-ss-ms")}";
             Directory.CreateDirectory(dir);
             return dir;
         }

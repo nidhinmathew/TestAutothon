@@ -9,20 +9,11 @@ namespace TestAutomation.Helper
 {
     public class AutomationHelper
     {
-        private readonly AutomationBrowserType browserType;
-        private readonly string driverPath;
-
-        public AutomationHelper(AutomationBrowserType browserType, string driverPath = "")
-        {
-            this.browserType = browserType;
-            this.driverPath = driverPath;
-        }
-
-        public void GetWikiLinks(List<string> testInputs, string outputDirectory, int noOfResults = 2)
+        public void GetWikiLinks(List<string> testInputs, AutomationBrowserType browserType, string driverPath, string outputDirectory, int noOfResults = 2)
         {
             Console.WriteLine($"UTC-{DateTime.UtcNow}: Retrieving Wiki Links.");
             var googleDriver = new AutomationDriver();
-            googleDriver.StartBrowser(this.browserType, 3, driverPath);
+            googleDriver.StartBrowser(browserType, 3, driverPath);
 
             AutomationFacade facade = new AutomationFacade(googleDriver.Browser);
             if(testInputs != null && testInputs.Any())
@@ -38,25 +29,55 @@ namespace TestAutomation.Helper
             googleDriver.StopBrowser();
         }
 
-        public void Automate(List<string> testInputs, string outputDirectory, int degreeOfParallelism = 5)
+        public void Automate(List<string> testInputs, AutomationBrowserType browserType, string driverPath, string outputDirectory, int degreeOfParallelism = 5)
         {
             Console.WriteLine($"UTC-{DateTime.UtcNow}: Automation started.");
-            ParallelOptions option = new ParallelOptions() { MaxDegreeOfParallelism = degreeOfParallelism };        
-            
+            if (browserType == AutomationBrowserType.PCChromeBrowser)
+            {
+                List<Task> tasks = new List<Task>()
+                {
+                    Task.Factory.StartNew(() => {
+                       RunTests(testInputs.Take(1).ToList(), AutomationBrowserType.MobileChromeBrowser, driverPath, outputDirectory, 1);
+                    }),
+                    Task.Factory.StartNew(() => {
+                        RunTests(testInputs.Skip(1).ToList(), AutomationBrowserType.PCChromeBrowser, driverPath, outputDirectory, degreeOfParallelism);
+                    })
+                };
+
+                Task.WaitAll(tasks.ToArray());
+            }
+            else
+            {
+                RunTests(testInputs, AutomationBrowserType.PCHeadlessChromeBrowser, driverPath, outputDirectory, degreeOfParallelism);
+            }            
+
+            var reportData = GetReportData(testInputs, outputDirectory);
+
+            var report = ReportGenerator.Generate(reportData, "Report Template\\TestAutothonReport.html");
+            AutomationUtility.SaveReport(report, $"{outputDirectory}\\Report.html");
+
+            Console.WriteLine($"UTC-{DateTime.UtcNow}: Automation completed.");
+        }
+
+
+        private void RunTests(List<string> testInputs, AutomationBrowserType browserType, string driverPath, string outputDirectory, int degreeOfParallelism = 5)
+        {
+            ParallelOptions option = new ParallelOptions() { MaxDegreeOfParallelism = browserType != AutomationBrowserType.MobileChromeBrowser ? degreeOfParallelism : 1 };
+
             Parallel.ForEach(testInputs, option, (input) =>
             {
                 var info = AutomationUtility.Deserialize<MovieInfo>($"{outputDirectory}\\{AutomationUtility.ExcludeSymbols(input)}.xml");
-                if(info != null)
+                if (info != null)
                 {
                     var automationDriver = new AutomationDriver();
-                    automationDriver.StartBrowser(this.browserType, 3, driverPath);
+                    automationDriver.StartBrowser(browserType, 3, driverPath);
                     AutomationFacade facade = new AutomationFacade(automationDriver.Browser, 120);
 
                     try
                     {
-                        info = facade.Run(info, outputDirectory, this.browserType);
+                        info = facade.Run(info, outputDirectory, browserType);
 
-                        if(string.IsNullOrEmpty(info.Directors_Wiki))
+                        if (string.IsNullOrEmpty(info.Directors_Wiki))
                             info.Directors_Wiki = "Cannot find Wikipedia result";
 
                         if (string.IsNullOrEmpty(info.Directors_Imdb))
@@ -72,21 +93,13 @@ namespace TestAutomation.Helper
                         info.Directors_Imdb = "Cannot find IMDb result";
                         info.Directors_Wiki = "Cannot find Wikipedia result";
                     }
-                    
+
                     AutomationUtility.Serialize<MovieInfo>(info, $"{outputDirectory}\\{AutomationUtility.ExcludeSymbols(info.Name)}.xml");
                     automationDriver.StopBrowser();
                 }
             });
-
-            var reportData = GetReportData(testInputs, outputDirectory);
-
-            var report = ReportGenerator.Generate(reportData, "Report Template\\TestAutothonReport.html");
-            AutomationUtility.SaveReport(report, $"{outputDirectory}\\Report.html");
-
-            Console.WriteLine($"UTC-{DateTime.UtcNow}: Automation completed.");
         }
-
-        public List<List<string>> GetReportData(List<string> testInputs, string outputDirectory)
+        private List<List<string>> GetReportData(List<string> testInputs, string outputDirectory)
         {
             var header = new List<string> { "Name", "WikiLink", "Wiki_Directors", "Wiki_Screenshot", "ImdbLink", "Imdb_Directors", "Wiki_Screenshot", "Result" };
             var reportData = new List<List<string>>();
