@@ -18,7 +18,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\Output\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -53,15 +53,15 @@
     <Folder Include="Output\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TestAutomation.Helper\TestAutomation.Helper.csproj">
-      <Project>{2C9EA3DE-4B5F-43AD-B18B-E379800ACD64}</Project>
-      <Name>TestAutomation.Helper</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Report Template\TestAutothonReport.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TestAutomation.Helper\TestAutomation.Helper.csproj">
+      <Project>{2c9ea3de-4b5f-43ad-b18b-e379800acd64}</Project>
+      <Name>TestAutomation.Helper</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
