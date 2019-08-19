@@ -10,7 +10,7 @@ using System.Xml;
 using System.Xml.Serialization;
 
 namespace TestAutomation.Helper
-{
+{ 
     public static class AutomationUtility
     {
         public static double CalculateSimilarity(string source, string target)

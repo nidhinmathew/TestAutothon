@@ -90,7 +90,7 @@ namespace TestAutothon_Combined
             helper.GetWikiLinks(MovieNames, browserType, reportDirectory, noOfWikiLinks);
             helper.Automate(MovieNames, browserType, reportDirectory, maxNoOfThreads);
 
-            Console.WriteLine("Completed job");
+            Console.WriteLine("Completed job"); 
         }
 
         private static List<string> GetInputFromFile(string filePath)

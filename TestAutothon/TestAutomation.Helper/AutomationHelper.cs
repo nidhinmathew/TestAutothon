@@ -104,7 +104,7 @@ namespace TestAutomation.Helper
             var header = new List<string> { "Name", "WikiLink", "Wiki_Directors", "Wiki_Screenshot", "ImdbLink", "Imdb_Directors", "Wiki_Screenshot", "Result" };
             var reportData = new List<List<string>>();
             reportData.Add(header);
-
+             
             testInputs.ForEach(input => {
                 var info = AutomationUtility.Deserialize<MovieInfo>($"{outputDirectory}\\{AutomationUtility.ExcludeSymbols(input)}.xml");
                 if(info != null)

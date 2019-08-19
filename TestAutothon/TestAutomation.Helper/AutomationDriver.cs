@@ -13,7 +13,7 @@ namespace TestAutomation.Helper
         private WebDriverWait browserWait;
 
         private IWebDriver browser;
-
+         
         public IWebDriver Browser
         {
             get
