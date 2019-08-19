@@ -36,9 +36,9 @@ namespace TestAutomation.Helper
             {
                 List<Task> tasks = new List<Task>()
                 {
-                    Task.Factory.StartNew(() => {
-                       RunTests(testInputs.Take(1).ToList(), AutomationBrowserType.MobileChromeBrowser, outputDirectory, 1);
-                    }),
+                    //Task.Factory.StartNew(() => {
+                    //   RunTests(testInputs.Take(1).ToList(), AutomationBrowserType.MobileChromeBrowser, outputDirectory, 1);
+                    //}),
                     Task.Factory.StartNew(() => {
                         RunTests(testInputs.Skip(1).ToList(), AutomationBrowserType.PCChromeBrowser, outputDirectory, degreeOfParallelism);
                     })
