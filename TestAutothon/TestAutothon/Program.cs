@@ -83,7 +83,7 @@ namespace TestAutothon_Combined
 
             Console.WriteLine("Starting job");
 
-            Console.WriteLine(args);
+            Console.WriteLine(args); 
 
             string reportDirectory = AutomationUtility.GetOutputDirectory(outputDirectory);
             AutomationHelper helper = new AutomationHelper();
