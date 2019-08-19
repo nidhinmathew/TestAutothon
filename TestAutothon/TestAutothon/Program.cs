@@ -87,8 +87,8 @@ namespace TestAutothon_Combined
 
             string reportDirectory = AutomationUtility.GetOutputDirectory(outputDirectory);
             AutomationHelper helper = new AutomationHelper();
-            helper.GetWikiLinks(MovieNames, browserType, @"F:\Softwares\chromedriver_win32", reportDirectory, noOfWikiLinks);
-            helper.Automate(MovieNames, browserType, @"F:\Softwares\chromedriver_win32", reportDirectory, maxNoOfThreads);
+            helper.GetWikiLinks(MovieNames, browserType, reportDirectory, noOfWikiLinks);
+            helper.Automate(MovieNames, browserType, reportDirectory, maxNoOfThreads);
 
             Console.WriteLine("Completed job");
         }

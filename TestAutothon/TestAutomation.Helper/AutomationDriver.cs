@@ -46,15 +46,15 @@ namespace TestAutomation.Helper
             }
         }
 
-        public void StartBrowser(AutomationBrowserType browserType = AutomationBrowserType.PCChromeBrowser, int defaultTimeOut = 1, string driverPath = "")
+        public void StartBrowser(AutomationBrowserType browserType = AutomationBrowserType.PCChromeBrowser, int defaultTimeOut = 1)
         {
             switch (browserType)
             {
                 case AutomationBrowserType.PCChromeBrowser:
-                    this.Browser = GetPCChromeDriver(driverPath);
+                    this.Browser = GetPCChromeDriver();
                     break;
                 case AutomationBrowserType.PCHeadlessChromeBrowser:
-                    this.Browser = GetPCHeadlessChromeDriver(driverPath);
+                    this.Browser = GetPCHeadlessChromeDriver();
                     break;
                 case AutomationBrowserType.MobileChromeBrowser:
                     this.Browser = GetMobileChromeDriver();
@@ -73,19 +73,19 @@ namespace TestAutomation.Helper
             this.BrowserWait = null;
         }
 
-        private IWebDriver GetPCChromeDriver(string driverPath = "")
+        private IWebDriver GetPCChromeDriver()
         {
             ChromeOptions chromeOptions = new ChromeOptions();
             chromeOptions.AddArgument("start-maximized");
-            return new ChromeDriver(driverPath, chromeOptions);
+            return new ChromeDriver(chromeOptions);
         }
 
-        private IWebDriver GetPCHeadlessChromeDriver(string driverPath = "")
+        private IWebDriver GetPCHeadlessChromeDriver()
         {
             ChromeOptions chromeOptions = new ChromeOptions();
             chromeOptions.AddArgument("start-maximized");
             chromeOptions.AddArgument("headless");
-            return new ChromeDriver(driverPath, chromeOptions);
+            return new ChromeDriver(chromeOptions);
         }
 
         private IWebDriver GetMobileChromeDriver()

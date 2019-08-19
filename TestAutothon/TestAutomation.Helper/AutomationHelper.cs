@@ -9,11 +9,11 @@ namespace TestAutomation.Helper
 {
     public class AutomationHelper
     {
-        public void GetWikiLinks(List<string> testInputs, AutomationBrowserType browserType, string driverPath, string outputDirectory, int noOfResults = 2)
+        public void GetWikiLinks(List<string> testInputs, AutomationBrowserType browserType, string outputDirectory, int noOfResults = 2)
         {
             Console.WriteLine($"UTC-{DateTime.UtcNow}: Retrieving Wiki Links.");
             var googleDriver = new AutomationDriver();
-            googleDriver.StartBrowser(browserType, 3, driverPath);
+            googleDriver.StartBrowser(browserType, 3);
 
             AutomationFacade facade = new AutomationFacade(googleDriver.Browser);
             if(testInputs != null && testInputs.Any())
@@ -29,7 +29,7 @@ namespace TestAutomation.Helper
             googleDriver.StopBrowser();
         }
 
-        public void Automate(List<string> testInputs, AutomationBrowserType browserType, string driverPath, string outputDirectory, int degreeOfParallelism = 5)
+        public void Automate(List<string> testInputs, AutomationBrowserType browserType, string outputDirectory, int degreeOfParallelism = 5)
         {
             Console.WriteLine($"UTC-{DateTime.UtcNow}: Automation started.");
             if (browserType == AutomationBrowserType.PCChromeBrowser)
@@ -37,10 +37,10 @@ namespace TestAutomation.Helper
                 List<Task> tasks = new List<Task>()
                 {
                     Task.Factory.StartNew(() => {
-                       RunTests(testInputs.Take(1).ToList(), AutomationBrowserType.MobileChromeBrowser, driverPath, outputDirectory, 1);
+                       RunTests(testInputs.Take(1).ToList(), AutomationBrowserType.MobileChromeBrowser, outputDirectory, 1);
                     }),
                     Task.Factory.StartNew(() => {
-                        RunTests(testInputs.Skip(1).ToList(), AutomationBrowserType.PCChromeBrowser, driverPath, outputDirectory, degreeOfParallelism);
+                        RunTests(testInputs.Skip(1).ToList(), AutomationBrowserType.PCChromeBrowser, outputDirectory, degreeOfParallelism);
                     })
                 };
 
@@ -48,7 +48,7 @@ namespace TestAutomation.Helper
             }
             else
             {
-                RunTests(testInputs, AutomationBrowserType.PCHeadlessChromeBrowser, driverPath, outputDirectory, degreeOfParallelism);
+                RunTests(testInputs, AutomationBrowserType.PCHeadlessChromeBrowser, outputDirectory, degreeOfParallelism);
             }            
 
             var reportData = GetReportData(testInputs, outputDirectory);
@@ -60,7 +60,7 @@ namespace TestAutomation.Helper
         }
 
 
-        private void RunTests(List<string> testInputs, AutomationBrowserType browserType, string driverPath, string outputDirectory, int degreeOfParallelism = 5)
+        private void RunTests(List<string> testInputs, AutomationBrowserType browserType, string outputDirectory, int degreeOfParallelism = 5)
         {
             ParallelOptions option = new ParallelOptions() { MaxDegreeOfParallelism = browserType != AutomationBrowserType.MobileChromeBrowser ? degreeOfParallelism : 1 };
 
@@ -70,7 +70,7 @@ namespace TestAutomation.Helper
                 if (info != null)
                 {
                     var automationDriver = new AutomationDriver();
-                    automationDriver.StartBrowser(browserType, 3, driverPath);
+                    automationDriver.StartBrowser(browserType, 3);
                     AutomationFacade facade = new AutomationFacade(automationDriver.Browser, 120);
 
                     try
