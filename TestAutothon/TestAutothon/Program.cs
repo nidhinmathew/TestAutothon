@@ -16,23 +16,23 @@ namespace TestAutothon_Combined
             "The Shawshank Redemption",
             "NonExisting",
             "The Godfather",
-            "The Dark Knight",
-            "Pulp Fiction",
-            "Schindler's List",
-            "The Lord of the Rings: The Return of the King",//* multiple imdb links in wiki
-            "The Good,The Bad,The Ugly", //* Invalid wiki link in bing
-            "12 Angry Men",
-            "Inception",
-            "Forrest Gump",
-            "Fight Club",
-            "Star Wars:Episode V-The Empire Strikes Back", //Works, but confused with video game
-            "Goodfellas",
-            "The Matrix", //The Wachowskis(Combined brother names in wiki)
-            "One Flew Over The Cuckoo's Nest", //Novel vs Movie wiki page and special characters in director name
-            "Seven Samurai",
-            "Avengers: Infinity War", // "Anthony Russo\r\nJoe Russo" as single name in wiki
-            "Interstellar",
-            "Se7en"
+            //"The Dark Knight",
+            //"Pulp Fiction",
+            //"Schindler's List",
+            //"The Lord of the Rings: The Return of the King",//* multiple imdb links in wiki
+            //"The Good,The Bad,The Ugly", //* Invalid wiki link in bing
+            //"12 Angry Men",
+            //"Inception",
+            //"Forrest Gump",
+            //"Fight Club",
+            //"Star Wars:Episode V-The Empire Strikes Back", //Works, but confused with video game
+            //"Goodfellas",
+            //"The Matrix", //The Wachowskis(Combined brother names in wiki)
+            //"One Flew Over The Cuckoo's Nest", //Novel vs Movie wiki page and special characters in director name
+            //"Seven Samurai",
+            //"Avengers: Infinity War", // "Anthony Russo\r\nJoe Russo" as single name in wiki
+            //"Interstellar",
+            //"Se7en"
         };
 
         public static AutomationBrowserType browserType;
@@ -81,11 +81,16 @@ namespace TestAutothon_Combined
                 outputDirectory = args[4];
             }
 
+            Console.WriteLine("Starting job");
+
+            Console.WriteLine(args);
 
             string reportDirectory = AutomationUtility.GetOutputDirectory(outputDirectory);
             AutomationHelper helper = new AutomationHelper();
             helper.GetWikiLinks(MovieNames, browserType, @"F:\Softwares\chromedriver_win32", reportDirectory, noOfWikiLinks);
             helper.Automate(MovieNames, browserType, @"F:\Softwares\chromedriver_win32", reportDirectory, maxNoOfThreads);
+
+            Console.WriteLine("Completed job");
         }
 
         private static List<string> GetInputFromFile(string filePath)
