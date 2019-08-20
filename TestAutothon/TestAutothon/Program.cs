@@ -22,17 +22,17 @@ namespace TestAutothon_Combined
             "The Lord of the Rings: The Return of the King",//* multiple imdb links in wiki
             "The Good,The Bad,The Ugly", //* Invalid wiki link in bing
             "12 Angry Men",
-            "Inception",
-            "Forrest Gump",
-            "Fight Club",
-            "Star Wars:Episode V-The Empire Strikes Back", //Works, but confused with video game
-            "Goodfellas",
-            "The Matrix", //The Wachowskis(Combined brother names in wiki)
-            "One Flew Over The Cuckoo's Nest", //Novel vs Movie wiki page and special characters in director name
-            "Seven Samurai",
-            "Avengers: Infinity War", // "Anthony Russo\r\nJoe Russo" as single name in wiki
-            "Interstellar",
-            "Se7en"
+            //"Inception",
+            //"Forrest Gump",
+            //"Fight Club",
+            //"Star Wars:Episode V-The Empire Strikes Back", //Works, but confused with video game
+            //"Goodfellas",
+            //"The Matrix", //The Wachowskis(Combined brother names in wiki)
+            //"One Flew Over The Cuckoo's Nest", //Novel vs Movie wiki page and special characters in director name
+            //"Seven Samurai",
+            //"Avengers: Infinity War", // "Anthony Russo\r\nJoe Russo" as single name in wiki
+            //"Interstellar",
+            //"Se7en"
         };
 
         public static AutomationBrowserType browserType;
